@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using kaedc.Models;
+using kaedc.Services;
 
 namespace kaedc.Controllers
 {
@@ -35,6 +36,24 @@ namespace kaedc.Controllers
             var kaedc = _context.Transaction.Where(t => t.ServiceId == 5).Include(t => t.PaymentMethod).Include(t => t.Service);
             return View(await kaedc.ToListAsync());
         }
+        public IActionResult BalanceUpdated(CreditDebitBindingModel creditDebit)
+        {
+            ViewData["User"] = _context.Kaedcuser.Where(u => u.BrinqaccountNumber == creditDebit.BrinqAccountNumber).FirstOrDefault();
+            if (creditDebit.serviceId == 3)
+            {
+                ViewData["Amount"] = Convert.ToDecimal(creditDebit.Amount) - 50;
+                ViewData["Action"] = "Credited";
+                ViewData["Verb"] = "to";
+            }
+            else
+            {
+                ViewData["Amount"] = Convert.ToDecimal(creditDebit.Amount);
+                ViewData["Action"] = "Debited";
+                ViewData["Verb"] = "from";
+            }
+            
+            return View();
+        }
 
         // GET: Transactions
         public async Task<IActionResult> Index()
@@ -62,6 +81,57 @@ namespace kaedc.Controllers
 
             return View(transaction);
         }
+
+        // GET: Transactions/CreditUser
+        public IActionResult CreditUser()
+        {
+            ViewData["PaymentMethodId"] = new SelectList(_context.Paymentmethod, "Id", "Name");
+            ViewData["ServiceId"] = new SelectList(_context.Service, "Id", "Name");
+            ViewData["CreditsAndDebits"] = _context.Transaction.Where(t => t.ServiceId == 3 && t.ServiceId == 4).Include(t => t.PaymentMethod).Include(t => t.Service);
+            return View();
+        }
+
+        // POST: Transactions/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreditUser(CreditDebitBindingModel creditDebit)
+        {
+            if (ModelState.IsValid)
+            {
+
+                //_context.Transaction.Add(transaction);
+                //await _context.SaveChangesAsync();
+
+                if (creditDebit.serviceId == 3)
+                {
+                    ExtraMethods.CreditUser(creditDebit.BrinqAccountNumber, creditDebit.Amount);
+                    await _context.SaveChangesAsync();
+                }
+                else if (creditDebit.serviceId == 4)
+                {
+                    ExtraMethods.DebitUser(creditDebit.BrinqAccountNumber, creditDebit.Amount);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    //ViewData["PaymentMethodId"] = new SelectList(_context.Paymentmethod, "Id", "Name", transaction.PaymentMethodId);
+                    ViewData["ServiceId"] = new SelectList(_context.Service, "Id", "Name");
+                    ViewData["CreditsAndDebits"] = _context.Transaction.Where(t => t.ServiceId == 3 && t.ServiceId == 4).Include(t => t.PaymentMethod).Include(t => t.Service);
+                    return View(creditDebit);
+                }
+
+                
+                //return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(BalanceUpdated), creditDebit);
+            }
+            //ViewData["PaymentMethodId"] = new SelectList(_context.Paymentmethod, "Id", "Name", transaction.PaymentMethodId);
+            ViewData["ServiceId"] = new SelectList(_context.Service, "Id", "Name");
+            ViewData["CreditsAndDebits"] = _context.Transaction.Where(t => t.ServiceId == 3 && t.ServiceId == 4).Include(t => t.PaymentMethod).Include(t => t.Service);
+            return View(creditDebit);
+        }
+
 
         // GET: Transactions/Create
         public IActionResult Create()

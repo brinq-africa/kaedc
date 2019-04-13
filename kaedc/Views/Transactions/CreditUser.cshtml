@@ -1,0 +1,122 @@
+﻿@model kaedc.Models.CreditDebitBindingModel
+@{
+    ViewData["Title"] = "Credit / Debit User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="header-icon">
+            <i class="fa fa-shopping-basket"></i>
+        </div>
+        <div class="header-title">
+            <h1>Credit / Debit</h1>
+            <small>Credit / Debit list & new Credits / Debits</small>
+        </div>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel lobidisable panel-bd">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <h4>Add Deposit</h4>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form asp-action="CreditUser">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label>Service</label>
+                                <select asp-for="serviceId" class="form-control" asp-items="ViewBag.ServiceId"></select>
+                                <span asp-validation-for="serviceId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Account Number</label>
+                                <input asp-for="BrinqAccountNumber" type="text" class="form-control" placeholder="Enter User's brinq account number" required>
+                                <span asp-validation-for="BrinqAccountNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Amount</label>
+                                <input asp-for="Amount" class="form-control" placeholder="Enter Amount" required>
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-add" value="CreditUser">
+                                    <i class="fa fa-check"></i> Submit
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="panel lobidisable panel-bd">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <h4>Recent Deposits</h4>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr class="info">
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ViewBag.CreditsAndDebits)
+                                    {
+                                        <tr>
+                                            <td>@item.Service.Name</td>
+                                            <td>@item.Amount</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td>Invoice 45 Payment</td>
+                                        <td>$ 180.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kihn, Lowe and Stark</td>
+                                        <td>$280.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Invoice 45 Payment</td>
+                                        <td>$ 150.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Larkin, O'Reilly and Schroeder</td>
+                                        <td>$ 350.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Invoice 45 Payment</td>
+                                        <td>$ 320.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lynch Ltd</td>
+                                        <td>$ 500.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Invoice 98 Payment</td>
+                                        <td>$ 654.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Invoice 74 payment</td>
+                                        <td>$ 164.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->

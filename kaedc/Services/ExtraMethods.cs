@@ -57,21 +57,53 @@ namespace kaedc.Services
 
         public static void DebitUser(string brinqaccountNumber, string Amount)
         {
+            Transaction transaction = new Transaction();
             var db = new Kaedc();
             var user = db.Kaedcuser.Where(k => k.BrinqaccountNumber == brinqaccountNumber).FirstOrDefault();
 
             var amount = Convert.ToInt64(Amount);
             user.MainBalance = user.MainBalance - amount;
+
+            //update DB
+            transaction.Id = GenerateId();
+            transaction.ServiceId = 3;
+            transaction.Amount = Amount;
+            transaction.PayersName = user.UserName;
+            transaction.PaymentMethodId = 1;
+            transaction.transactionsStatus = "completed";
+            transaction.Datetime = DateTime.Now;
+            transaction.KaedcUserNavigation = user;
+            transaction.Service = db.Service.Where(s => s.Id == 4).FirstOrDefault();
+
+            db.Add(transaction);
+            db.SaveChanges();
         }
 
         public static void CreditUser(string brinqaccountNumber, string Amount)
         {
+            Transaction transaction = new Transaction();
             var db = new Kaedc();
-            var user = db.Kaedcuser.Where(k => k.BrinqaccountNumber == brinqaccountNumber).FirstOrDefault();
 
+
+            var user = db.Kaedcuser.Where(k => k.BrinqaccountNumber == brinqaccountNumber).FirstOrDefault();
             var amount = Convert.ToInt64(Amount) - 50;
             
+            //update userbalance
             user.MainBalance = user.MainBalance + amount;
+
+            //update DB
+            transaction.Id = GenerateId();
+            transaction.ServiceId = 3;
+            transaction.Amount = Amount;
+            transaction.PayersName = user.UserName;
+            transaction.PaymentMethodId = 1;
+            transaction.transactionsStatus = "completed";
+            transaction.Datetime = DateTime.Now;
+            transaction.KaedcUserNavigation = user;
+            transaction.Service = db.Service.Where(s => s.Id == 3).FirstOrDefault();
+
+            db.Add(transaction);
+            db.SaveChanges();
         }
 
         public static void AddProfit(Kaedcuser user, Transaction transaction)
@@ -98,6 +130,7 @@ namespace kaedc.Services
             profitTransacton.transactionsStatus = "completed";
             profitTransacton.Datetime = DateTime.Now;
             profitTransacton.KaedcUserNavigation = user;
+            //profitTransacton.Service = db.Service.Where(s => s.Id == 6).FirstOrDefault();
 
             db.Add(profitTransacton);
             

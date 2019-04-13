@@ -65,7 +65,7 @@ namespace kaedc.Models
         public string Surname { get; set; }
 
         [Required]
-        [Display(Name = "PhoneNumber")]
+        [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
 
         [Required]
