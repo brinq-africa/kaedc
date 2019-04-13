@@ -1,0 +1,157 @@
+﻿@model kaedc.Models.Transaction
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Transaction</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Amount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Amount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.KaedcUser)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.KaedcUser)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Datetime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Datetime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MeterName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeterName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Meternumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Meternumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactionReference)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactionReference)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Hash)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Hash)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PayersName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PayersName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ApiUniqueReference)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ApiUniqueReference)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.GatewayresponseCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.GatewayresponseCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.GatewayresponseMessage)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.GatewayresponseMessage)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Statuscode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Statuscode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.StatusMessage)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StatusMessage)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RecipientPhoneNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.RecipientPhoneNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Token)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Token)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PhcnUnique)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PhcnUnique)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PayerIp)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PayerIp)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AgentProfit)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AgentProfit)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CoordinatorProfit)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CoordinatorProfit)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BrinqProfit)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BrinqProfit)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TopUpValue)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TopUpValue)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PaymentMethod)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PaymentMethod.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Service)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Service.Id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
