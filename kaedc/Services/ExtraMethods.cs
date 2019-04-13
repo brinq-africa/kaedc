@@ -61,6 +61,7 @@ namespace kaedc.Services
             var db = new Kaedc();
             var user = db.Kaedcuser.Where(k => k.BrinqaccountNumber == brinqaccountNumber).FirstOrDefault();
 
+            //update user's balance
             var amount = Convert.ToInt64(Amount);
             user.MainBalance = user.MainBalance - amount;
 
@@ -86,9 +87,11 @@ namespace kaedc.Services
 
 
             var user = db.Kaedcuser.Where(k => k.BrinqaccountNumber == brinqaccountNumber).FirstOrDefault();
+
+            //deduct 50naira as stamp duty fee
             var amount = Convert.ToInt64(Amount) - 50;
             
-            //update userbalance
+            //update user's balance
             user.MainBalance = user.MainBalance + amount;
 
             //update DB
