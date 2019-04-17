@@ -62,7 +62,7 @@ namespace kaedc.Controllers
                 return BadRequest(result);
             }
 
-            return Ok(result);
+            return Ok(new { result, user});
         }
 
         private string GenerateAccountNumber(RegisterBindingModel model)
@@ -106,11 +106,10 @@ namespace kaedc.Controllers
                         signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(signingkey, SecurityAlgorithms.HmacSha256)
                         );
 
-
-
                     return Ok(new {
                         Token = new JwtSecurityTokenHandler().WriteToken(token),
-                        Expiration = token.ValidTo
+                        Expiration = token.ValidTo,
+                        user
                     });
                 }
                 else
