@@ -23,8 +23,8 @@ namespace kaedc.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        //[Display(Name = "Remember me?")]
+        //public bool RememberMe { get; set; }
     }
 
     public class ChangePasswordBindingModel
@@ -57,7 +57,7 @@ namespace kaedc.Models
         public string Username { get; set; }
 
         [Required]
-        [Display(Name = "FirstName")]
+        [Display(Name = "Firstname")]
         public string Firstname { get; set; }
 
         [Required]
