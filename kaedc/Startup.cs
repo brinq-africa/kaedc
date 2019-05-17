@@ -55,14 +55,27 @@ namespace kaedc
             .AddEntityFrameworkStores<Kaedc>()
             .AddDefaultTokenProviders();
 
+            //services.ConfigureApplicationCookie(opt => {
+            //    opt.LoginPath = "/identity/account/login";
+            //    opt.ReturnUrlParameter = "RedirectUrl";
+            //    opt.LogoutPath = "/identity/account/logout";
+            //    //opt.AccessDeniedPath = "/Login/Index";
+            //    //opt.ExpireTimeSpan = new TimeSpan(0, 15, 0);
+            //});
 
-            services.AddAuthentication(opt => 
+            services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddCookie(cfg => cfg.SlidingExpiration = true)
+            .AddCookie(cfg => 
+            {
+                cfg.SlidingExpiration = true;
+                cfg.LoginPath = "/Identity/Account/Login";
+                cfg.LogoutPath = "/Identity/Account/Logout";
+                cfg.ExpireTimeSpan = new TimeSpan(0, 30, 15);
+            })
             .AddJwtBearer(options =>
             {
 

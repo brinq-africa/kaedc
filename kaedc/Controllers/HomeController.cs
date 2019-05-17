@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace kaedc.Controllers
 {
-    //[Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class HomeController : Controller
     {
+        
         public IActionResult Index()
         {
             return View();
@@ -25,7 +26,7 @@ namespace kaedc.Controllers
             return View();
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";

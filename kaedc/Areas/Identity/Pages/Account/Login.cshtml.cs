@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace kaedc.Areas.Identity.Pages.Account
 {
@@ -18,11 +20,13 @@ namespace kaedc.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<Kaedcuser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly Kaedc _context;
 
-        public LoginModel(SignInManager<Kaedcuser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<Kaedcuser> signInManager, ILogger<LoginModel> logger, Kaedc context)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _context = context;
         }
 
         [BindProperty]
@@ -75,9 +79,22 @@ namespace kaedc.Areas.Identity.Pages.Account
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+
+                var user = _context.Kaedcuser.Where(u => u.Email == Input.Email).FirstOrDefault();
+                var claims = new[]
+                    {
+                        //new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                        //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        new Claim(ClaimTypes.Name, user.Email),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    };
+                ClaimsIdentity identity = new ClaimsIdentity(claims, "cookie");
+                var claimsPrincipal = new ClaimsPrincipal(identity);
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

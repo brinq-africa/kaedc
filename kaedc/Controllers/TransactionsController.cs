@@ -58,6 +58,38 @@ namespace kaedc.Controllers
             return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmTransaction(CreditDebitBindingModel creditDebit)
+        {
+            //_context.Transaction.Add(transaction);
+            //await _context.SaveChangesAsync();
+
+            var user = _context.Kaedcuser.Where(u => u.BrinqaccountNumber == creditDebit.BrinqAccountNumber).FirstOrDefault();
+
+            if (creditDebit.serviceId == 3 && user != null)
+            {
+                ExtraMethods.CreditUser(creditDebit.BrinqAccountNumber, creditDebit.Amount);
+                await _context.SaveChangesAsync();
+            }
+            else if (creditDebit.serviceId == 4)
+            {
+                ExtraMethods.DebitUser(creditDebit.BrinqAccountNumber, creditDebit.Amount);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                //ViewData["PaymentMethodId"] = new SelectList(_context.Paymentmethod, "Id", "Name", transaction.PaymentMethodId);
+                ViewData["ServiceId"] = new SelectList(_context.Service, "Id", "Name");
+                ViewData["CreditsAndDebits"] = _context.Transaction.Where(t => t.ServiceId == 3 && t.ServiceId == 4).Include(t => t.PaymentMethod).Include(t => t.Service);
+                return View(creditDebit);
+            }
+
+
+            //return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(BalanceUpdated), creditDebit);
+        }
+
         // GET: Transactions
         public async Task<IActionResult> Index()
         {
@@ -90,7 +122,7 @@ namespace kaedc.Controllers
         {
             ViewData["PaymentMethodId"] = new SelectList(_context.Paymentmethod, "Id", "Name");
             ViewData["ServiceId"] = new SelectList(_context.Service, "Id", "Name");
-            ViewData["CreditsAndDebits"] = _context.Transaction.Where(t => t.ServiceId == 3 && t.ServiceId == 4).Include(t => t.PaymentMethod).Include(t => t.Service);
+            ViewData["CreditsAndDebits"] = _context.Transaction.Where(t => t.ServiceId == 3 && t.ServiceId == 4).Include(t => t.PaymentMethod).Include(t => t.Service).ToList();
             return View();
         }
 
@@ -107,7 +139,9 @@ namespace kaedc.Controllers
                 //_context.Transaction.Add(transaction);
                 //await _context.SaveChangesAsync();
 
-                if (creditDebit.serviceId == 3)
+                var user = _context.Kaedcuser.Where(u => u.BrinqaccountNumber == creditDebit.BrinqAccountNumber).FirstOrDefault();
+
+                if (creditDebit.serviceId == 3 && user != null)
                 {
                     ExtraMethods.CreditUser(creditDebit.BrinqAccountNumber, creditDebit.Amount);
                     await _context.SaveChangesAsync();
@@ -125,9 +159,9 @@ namespace kaedc.Controllers
                     return View(creditDebit);
                 }
 
-                
-                //return RedirectToAction(nameof(Index));
+
                 return RedirectToAction(nameof(BalanceUpdated), creditDebit);
+                //return RedirectToAction(nameof(ConfirmTransaction), creditDebit);
             }
             //ViewData["PaymentMethodId"] = new SelectList(_context.Paymentmethod, "Id", "Name", transaction.PaymentMethodId);
             ViewData["ServiceId"] = new SelectList(_context.Service, "Id", "Name");

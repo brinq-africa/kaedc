@@ -25,13 +25,6 @@ namespace kaedc.Controllers
             db = _db;
         }
 
-        // GET: api/Transaction
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
         // GET: api/Transaction/5
         [HttpGet]
         [Authorize]
@@ -45,26 +38,8 @@ namespace kaedc.Controllers
             var user = _userManager.FindByEmailAsync(username).Result;
 
             var mytransactions = db.Kaedcuser.Where(t => t.Id == user.Id).Select(t => t.Transaction).ToList();
-            //var json = JsonConvert.SerializeObject(mytransactions);
+            
             return Ok(mytransactions);
-        }
-
-        // POST: api/Transaction
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT: api/Transaction/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

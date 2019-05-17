@@ -104,7 +104,7 @@ namespace kaedc.Areas.Identity.Pages.Account
                     MainBalance = Convert.ToInt64(Input.Mainbalance),
                     IsActive = 1,
                     LoanBalance = 0,
-                    //BrinqaccountNumber = "BBICC2411",
+                    BrinqaccountNumber = GenerateAccountNumber(),
                     PhoneNumber = Input.PhoneNumber
                 };
 
@@ -139,7 +139,7 @@ namespace kaedc.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private string GenerateAccountNumber(InputModel model)
+        private string GenerateAccountNumber()
         {
             return "19" + DateTime.UtcNow.Ticks.ToString().Substring(9);
         }

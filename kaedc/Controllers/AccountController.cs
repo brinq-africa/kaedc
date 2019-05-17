@@ -103,7 +103,7 @@ namespace kaedc.Controllers
                         audience: "https://www.brinqkaedc.com",
                         expires: DateTime.UtcNow.AddYears(1),
                         claims: claims,
-                        signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(signingkey, SecurityAlgorithms.HmacSha256)
+                        signingCredentials: new SigningCredentials(signingkey, SecurityAlgorithms.HmacSha256)
                         );
 
                     return Ok(new {
@@ -122,6 +122,7 @@ namespace kaedc.Controllers
             return Unauthorized();
         }
 
+        //currently not in use but could be helpful in future use
         private string GenerateJSONWebToken(LoginBindingModel userInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]));
