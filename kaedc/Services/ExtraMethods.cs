@@ -34,6 +34,24 @@ namespace kaedc.Services
             return lastId;
         }
 
+        public static decimal BrinqProfit(decimal amount, int service)
+        {
+            //this can be changed based on commisions made available to Brinq Africa by her Superior Vendor
+            decimal profit = 0.00M;
+            if (service == 1)
+            {
+                profit = (amount - 100) * 0.015M;
+                return profit;
+            }
+            else if(service == 2)
+            {
+                profit = (amount) * 0.02M;
+                return profit;
+            }
+
+            return 0.00M;
+        }        
+
         public static string GenerateHash(string combinedString, byte[] key)
         {
             HMACSHA1 myhmacsha1 = new HMACSHA1(key);

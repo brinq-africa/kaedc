@@ -109,8 +109,8 @@
                                 <thead>
                                     <tr class="info">
                                         <th>Username</th>
-                                        <th>Firstname</th>
-                                        <th>Lastname</th>
+                                        <th>Full name</th>
+                                        <th>Account Number</th>
                                         <th>Mobile</th>
                                         <th>Email</th>
                                         <th>Role</th>
@@ -125,8 +125,8 @@
                                     {
                                     <tr>
                                         <td>@item.UserName</td>
-                                        <td>@item.Firstname</td>
-                                        <td>@item.Surname</td>
+                                        <td>@item.Firstname @item.Surname</td>
+                                        <td>@item.BrinqaccountNumber</td>
                                         <td>@item.PhoneNumber</td>
                                         <td>@item.Email</td>
                                         <td></td>
@@ -151,7 +151,6 @@
                                                 //<input type="submit" title="TestTitle" value="TestValue" />
                                                 <td><button class="label-danger label label-default">Inactive</button></td>
                                             }
-
                                         }
                                         <td>
                                             <button type="button" class="btn btn-add btn-sm" data-toggle="modal" data-target="#customer1"><i class="fa fa-pencil"></i></button>

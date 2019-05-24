@@ -24,7 +24,7 @@ namespace kaedc.Controllers
 
         public async Task<IActionResult> viewtransactions()
         {
-            var kaedc = _context.Transaction.Include(t => t.PaymentMethod).Include(t => t.Service);
+            var kaedc = _context.Transaction.Include(t => t.PaymentMethod).Include(t => t.Service).OrderByDescending(i => i.Datetime);
             return View(await kaedc.ToListAsync());
         }
 

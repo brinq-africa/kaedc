@@ -21,28 +21,24 @@ namespace kaedc.Controllers
     public class ElectricityController : ControllerBase
     {
         private Kaedc _db;
-        public static IConfiguration config;
+        public static IConfiguration _configuration;
         private UserManager<Kaedcuser> _userManager;
-        static string baseUri_MeterInfo = "https://irecharge.com.ng/pwr_api_sandbox/v2/get_meter_info.php"; //TODO: Parameterize
-        static string baseUri_VendPower = "https://irecharge.com.ng/pwr_api_sandbox/v2/vend_power.php"; //TODO: Parameterize
-        static string pubkey = "c5165ff3eab458e89425bad8c4f0908c"; //TODO: Parameterize
-        static string privKey = "66a7b282a044c656f037230200a3f53ea6e25227b8977c15e91822505bedc0319fbb69338f565c2e834382e62d2ebf8dddd35c5b14b44d07750b0597bdf106c5"; //TODO: Parameterize
-        static string vendor_code = "1901E58329"; //TODO: Parameterize
+        //static string baseUri_MeterInfo = "https://irecharge.com.ng/pwr_api_sandbox/v2/get_meter_info.php"; //TODO: Parameterize
+        //static string baseUri_VendPower = "https://irecharge.com.ng/pwr_api_sandbox/v2/vend_power.php"; //TODO: Parameterize
+        //static string pubkey = "c5165ff3eab458e89425bad8c4f0908c"; //TODO: Parameterize
+        //static string privKey = "66a7b282a044c656f037230200a3f53ea6e25227b8977c15e91822505bedc0319fbb69338f565c2e834382e62d2ebf8dddd35c5b14b44d07750b0597bdf106c5"; //TODO: Parameterize
+        //static string vendor_code = "1901E58329"; //TODO: Parameterize
 
 
 
-        public ElectricityController(Kaedc db, IConfiguration _config, UserManager<Kaedcuser> userManager)
+        public ElectricityController(Kaedc db, IConfiguration configuration, UserManager<Kaedcuser> userManager)
         {
             _db = db;
-            config = _config;
+            _configuration = configuration;
             _userManager = userManager;
         }
 
-        //static string vendor_code = config["Irecharge:VendorCode"];
-        //static string pubkey = config["Irecharge:PublicKey"];
-        //static string privKey = config["Irecharge:PrivateKey"];
-        //static string baseUri_MeterInfoAEDC = config["Irecharge:MeterInfoURL"];
-        //static string baseUri_VendPowerAEDC = config["Irecharge:VendPowerURL"];
+        
 
         [HttpGet]
         [Route("alltransactions")]
@@ -54,48 +50,49 @@ namespace kaedc.Controllers
 
 
         // POST: api/Electricity        
-        [HttpPost("FromBody")]
+        [HttpPost]
         [Authorize]
         [Route("GetMeterInfo")]        
-        public async Task<IActionResult> GetMeterInfoAsync([FromBody] Transaction transaction)
-        {            
+        public async Task<IActionResult> GetMeterInfoAsync([FromBody] MeterInfoModel model)
+        {     
+            string vendor_code = _configuration["Irecharge:VendorCode"];
+            string pubkey = _configuration["Irecharge:PublicKey"];
+            string privKey = _configuration["Irecharge:PrivateKey"];
+            string baseUri_MeterInfo = _configuration["Irecharge:MeterInfoURL"];
+
             if (!ModelState.IsValid)
             {
-                return BadRequest("Model State is not Valid");
+                return BadRequest("Invalid parameters");
             }
-            if (transaction.Meternumber == null || transaction.RecipientPhoneNumber == null)
-            {
-                return BadRequest("Null Values");
-            }
-
+            
             //get user details
             var username = HttpContext.User.Identity.Name;
             var user = _userManager.FindByEmailAsync(username).Result;
 
-            if (user.MainBalance <= Convert.ToDecimal(transaction.Amount))
+            if (user.MainBalance <= Convert.ToDecimal(model.Amount))
             {
                 return Ok("Insufficient Balance");
             }
 
-            string meter_number = transaction.Meternumber;
+            string meter_number = model.MeterNumber;
             //string disco = transaction.Service.Name;
             string disco;
-            if (transaction.ServiceId == 1)
+            int serviceId = 0;
+            if (model.Service == "KAEDC_Prepaid")
             {
                 disco = "Kaduna_Electricity_Disco";
+                serviceId = 1;
             }
-            else if (transaction.ServiceId == 2)
+            else if (model.Service == "KAEDC_Postpaid")
             {
                 disco = "Kaduna_Electricity_Disco_Postpaid";
+                serviceId = 2;
             }
             else
             {
                 return BadRequest("Invalid Service");
             }
-
-            //var service = await _db.Service.Where(s => s.Id == transaction.ServiceId).FirstAsync();
-
-
+            
             string ref_id = ExtraMethods.GenerateRandomNumber();
             string combinedstring = vendor_code + "|" + ref_id + "|" + meter_number + "|" + disco + "|" + pubkey;
             byte[] key = Encoding.ASCII.GetBytes(privKey);
@@ -115,27 +112,40 @@ namespace kaedc.Controllers
                 string response = webClient.DownloadString(baseUri_MeterInfo);
 
                 var jsonresult = JsonConvert.DeserializeObject<iRechargeMeterInfo>(response);
+                var transaction = new Transaction();
 
+                transaction.Id = ExtraMethods.GenerateId();
                 transaction.PayerIp = ExtraMethods.GetLocalIPAddress();
                 transaction.PaymentMethodId = 1;
                 transaction.MeterName = jsonresult.customer.name;
                 transaction.Statuscode = Convert.ToInt32(jsonresult.status);
                 transaction.StatusMessage = jsonresult.message;
                 transaction.ApiUniqueReference = ref_id;
-                transaction.Service = _db.Service.Where(s => s.Id == transaction.ServiceId).FirstOrDefault();
+                transaction.Service = _db.Service.Where(s => s.Id == serviceId).FirstOrDefault();
                 transaction.PhcnUnique = jsonresult.access_token;
                 transaction.Hash = hash;
                 transaction.transactionsStatus = "initiated";
                 transaction.Datetime = DateTime.Now;
                 transaction.KaedcUserNavigation = user;
                 transaction.KaedcUser = user.Id;
-                transaction.Amount = (Convert.ToDouble(transaction.Amount) + 100).ToString();
+                transaction.Amount = (Convert.ToDouble(model.Amount) + 100).ToString();
                 transaction.PayersName = user.UserName;
+                transaction.Meternumber = meter_number;
+                transaction.RecipientPhoneNumber = model.PhoneNumber;
 
                 _db.Transaction.Add(transaction);
                 await _db.SaveChangesAsync();
 
-                return Ok(transaction);
+                return Ok( new {
+                    ID = transaction.Id,
+                    SERVICE = transaction.Service.Name,
+                    AMOUNT = transaction.Amount,
+                    METER_NUMBER = transaction.Meternumber,
+                    METER_NAME = transaction.MeterName,
+                    PAYER = transaction.PayersName,
+                    PHONE_NUMBER = transaction.RecipientPhoneNumber,
+                    STATUS = transaction.transactionsStatus
+                });
             }
             catch (WebException ex)
             {
@@ -155,16 +165,22 @@ namespace kaedc.Controllers
         [HttpPost]
         [Authorize]
         [Route("vendpower/{id}")]
-        public IActionResult VendMeter(int id, Transaction transaction)
+        public async Task<IActionResult> VendMeter(int id, VendModel model)
         {
             //var transaction = db.Transaction.Where(t => t.Id == id).FirstOrDefault(); 
+            string vendor_code = _configuration["Irecharge:VendorCode"];
+            string pubkey = _configuration["Irecharge:PublicKey"];
+            string privKey = _configuration["Irecharge:PrivateKey"];
+            string baseUri_VendPower = _configuration["Irecharge:VendPowerURL"];
 
-            if (transaction.Id != id)
+            if (model.TransactionId != id)
             {
                 return BadRequest("Invalid Transaction");
             }
 
-            var transact = _db.Transaction.Where(t => t.Id == transaction.Id).FirstOrDefault();
+            //get existing data from DB
+            var transact = _db.Transaction.Where(t => t.Id == model.TransactionId).FirstOrDefault();
+
             //get user details
             var username = HttpContext.User.Identity.Name;
             var user = _userManager.FindByEmailAsync(username).Result;
@@ -176,13 +192,16 @@ namespace kaedc.Controllers
 
 
             string disco;
-            if (transaction.ServiceId == 1)
+            int serviceId = 0;
+            if (model.Service == "KAEDC_Prepaid")
             {
                 disco = "Kaduna_Electricity_Disco";
+                serviceId = 1;
             }
-            else if (transaction.ServiceId == 2)
+            else if (model.Service == "KAEDC_Postpaid")
             {
                 disco = "Kaduna_Electricity_Disco_Postpaid";
+                serviceId = 2;
             }
             else
             {
@@ -194,8 +213,6 @@ namespace kaedc.Controllers
             string access_token = transact.PhcnUnique;
             string amount = transact.Amount;
             string phone = transact.RecipientPhoneNumber;
-
-            //string email = transaction.BrinqpayUserNavigation.Email;
             string email = user.Email;
 
             string combinedstring = vendor_code + "|" + ref_id + "|" + meter_number + "|" + disco + "|" + amount + "|" + access_token + "|" + pubkey;
@@ -216,10 +233,7 @@ namespace kaedc.Controllers
                 webClient.QueryString.Add("email", email);
                 webClient.QueryString.Add("hash", hash);
 
-                //var fullstring = webClient.QueryString.ToString();
                 string response = webClient.DownloadString(baseUri_VendPower);
-
-                
 
                 var jsonresult = JsonConvert.DeserializeObject<iRechargeVendPower>(response);
 
@@ -230,6 +244,7 @@ namespace kaedc.Controllers
                 transact.ApiUniqueReference = ref_id;
                 transact.GatewayresponseMessage = response;
                 transact.Token = jsonresult.meter_token;
+                transact.BrinqProfit = ExtraMethods.BrinqProfit(model.Amount, serviceId);
                 transact.TopUpValue = jsonresult.units;
 
                 if (jsonresult.status != "00")
@@ -248,7 +263,19 @@ namespace kaedc.Controllers
                 _db.Update(transact);
                 _db.SaveChanges();
 
-                return Ok(transact);
+                //return Ok(transact);
+                return Ok(new
+                {
+                    ID = transact.Id,
+                    SERVICE = model.Service,
+                    AMOUNT = transact.Amount,
+                    METER_NUMBER = transact.Meternumber,
+                    METER_NAME = transact.MeterName,
+                    PAYER = transact.PayersName,
+                    PHONE_NUMBER = transact.RecipientPhoneNumber,
+                    STATUS = transact.transactionsStatus,
+                    TOKEN = transact.Token
+                });
             }
             catch (WebException ex)
             {

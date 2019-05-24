@@ -44,6 +44,7 @@ namespace kaedc.Controllers
 
         // POST api/Account/Register
         [AllowAnonymous]
+        [HttpPost]
         [Route("Register")]
         public async Task<IActionResult> Register(RegisterBindingModel model)
         {
@@ -59,10 +60,13 @@ namespace kaedc.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest(result);
+                return BadRequest(new {
+                    result,
+                    status = StatusCode(400)
+                });
             }
 
-            return Ok(new { result, user});
+            return Ok(new { result, user, Status = StatusCode(200)});
         }
 
         private string GenerateAccountNumber(RegisterBindingModel model)
@@ -71,6 +75,7 @@ namespace kaedc.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login(LoginBindingModel model)
         {           
@@ -101,7 +106,7 @@ namespace kaedc.Controllers
                     var token = new JwtSecurityToken(
                         issuer: "https://www.brinqkaedc.com",
                         audience: "https://www.brinqkaedc.com",
-                        expires: DateTime.UtcNow.AddYears(1),
+                        expires: DateTime.UtcNow.AddYears(1), 
                         claims: claims,
                         signingCredentials: new SigningCredentials(signingkey, SecurityAlgorithms.HmacSha256)
                         );
@@ -109,7 +114,14 @@ namespace kaedc.Controllers
                     return Ok(new {
                         Token = new JwtSecurityTokenHandler().WriteToken(token),
                         Expiration = token.ValidTo,
-                        user
+                        user.BrinqaccountNumber,
+                        user.MainBalance,
+                        user.IsActive,
+                        user.Firstname,
+                        user.Surname,
+                        user.Email,
+                        user.PhoneNumber,
+                        StatusCode = StatusCode(200)
                     });
                 }
                 else

@@ -37,8 +37,19 @@ namespace kaedc.Controllers
 
             var user = _userManager.FindByEmailAsync(username).Result;
 
-            var mytransactions = db.Kaedcuser.Where(t => t.Id == user.Id).Select(t => t.Transaction).ToList();
-            
+            //var mytransactions = db.Kaedcuser.Where(t => t.Id == user.Id).Select(t => t.Transaction).ToList();
+
+            var mytransactions = db.Transaction.Where(i => i.KaedcUser == user.Id).OrderByDescending(i => i.Datetime).Select(i => new
+            {
+                ID = i.Id,
+                SERVICE = i.Service.Name,
+                AMOUNT = i.Amount,
+                TOKEN = i.Token,
+                STATUS = i.transactionsStatus,
+                CREATEDAT = i.Datetime.ToLongDateString(),
+                CREATEDBY = i.KaedcUserNavigation.UserName,
+            }).ToList();
+
             return Ok(mytransactions);
         }
     }

@@ -108,7 +108,8 @@
                                         <th>Account</th>
                                         <th>Service</th>
                                         <th>Amount</th>
-                                        <th>Profit</th>
+                                        <th>Agent's Profit</th>
+                                        <th>Brinq's Profit</th>
                                         <th>Meter Number</th>
                                         <th>Ref ID</th>
                                         <th>Status Code</th>
@@ -128,6 +129,7 @@
                                         <td>@item.Service.Name</td>
                                         <td>@item.Amount</td>
                                         <td>@String.Format("{0:0.00}", @item.AgentProfit)</td>
+                                        <td>@String.Format("{0:0.00}", @item.BrinqProfit)</td>
                                         <td>@item.Meternumber</td>
                                         <td>@item.ApiUniqueReference</td>
                                         <td>@item.Statuscode</td>

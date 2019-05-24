@@ -12,7 +12,10 @@ using System.Web;
 using kaedc.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -23,6 +26,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace kaedc
 {
@@ -62,6 +66,31 @@ namespace kaedc
             //    //opt.AccessDeniedPath = "/Login/Index";
             //    //opt.ExpireTimeSpan = new TimeSpan(0, 15, 0);
             //});
+
+            services.AddSwaggerGen(i =>
+            {
+               i.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info {
+                   Title = "Brinq KAEDC",
+                   Description = "API documentation for Brinq Africa's KAEDC application",
+               });
+            });
+
+            //services.AddCors(config =>
+            //{
+            //    var policy = new CorsPolicy();
+            //    policy.Headers.Add("*");
+            //    policy.Methods.Add("*");
+            //    policy.Origins.Add("*");
+            //    policy.SupportsCredentials = true;
+            //    config.AddPolicy("policy", policy);
+            //});
+
+            services.AddAuthorization(auth =>
+            {
+                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme‌​)
+                    .RequireAuthenticatedUser().Build());
+            });
 
             services.AddAuthentication(opt =>
             {
@@ -112,6 +141,42 @@ namespace kaedc
                 app.UseHsts();
             }
 
+            //app.UseExceptionHandler(appBuilder =>
+            //{
+            //    appBuilder.Use(async (context, next) =>
+            //    {
+            //        var error = context.Features[typeof(IExceptionHandlerFeature)] as IExceptionHandlerFeature;
+
+            //        //when authorization has failed, should retrun a json message to client
+            //        if (error != null && error.Error is SecurityTokenExpiredException)
+            //        {
+            //            context.Response.StatusCode = 401;
+            //            context.Response.ContentType = "application/json";
+
+            //            await context.Response.WriteAsync(JsonConvert.SerializeObject(new
+            //            {
+            //                State = "Unauthorized",
+            //                Msg = "token expired"
+            //            }));
+            //        }
+            //        //when orther error, retrun a error message json to client
+            //        else if (error != null && error.Error != null)
+            //        {
+            //            context.Response.StatusCode = 500;
+            //            context.Response.ContentType = "application/json";
+            //            await context.Response.WriteAsync(JsonConvert.SerializeObject(new
+            //            {
+            //                State = "Internal Server Error",
+            //                Msg = error.Error.Message
+            //            }));
+            //        }
+            //        //when no error, do next.
+            //        else await next();
+            //    });
+            //});
+
+            //app.UseCors("policy");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -124,6 +189,11 @@ namespace kaedc
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+            });
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Core API");
             });
         }
 
