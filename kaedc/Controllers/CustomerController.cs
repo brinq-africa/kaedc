@@ -27,7 +27,7 @@ namespace kaedc.Controllers
         [Route("customerlist")]
         public List<Kaedcuser> customerlist()
         {
-            return db.Kaedcuser.ToList();
+            return db.Kaedcuser.OrderByDescending(c => c.CreatedAt).ToList();
         }
 
         // GET: api/Customer

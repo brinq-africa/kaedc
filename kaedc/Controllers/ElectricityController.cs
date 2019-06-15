@@ -128,8 +128,8 @@ namespace kaedc.Controllers
                 transaction.Datetime = DateTime.Now;
                 transaction.KaedcUserNavigation = user;
                 transaction.KaedcUser = user.Id;
-                transaction.Amount = (Convert.ToDouble(model.Amount) + 100).ToString();
-                transaction.PayersName = user.UserName;
+                transaction.Amount = model.Amount + 100;
+                transaction.PayersName = user.Surname + " " + user.Firstname;
                 transaction.Meternumber = meter_number;
                 transaction.RecipientPhoneNumber = model.PhoneNumber;
 
@@ -140,11 +140,12 @@ namespace kaedc.Controllers
                     ID = transaction.Id,
                     SERVICE = transaction.Service.Name,
                     AMOUNT = transaction.Amount,
-                    METER_NUMBER = transaction.Meternumber,
-                    METER_NAME = transaction.MeterName,
+                    METERNUMBER = transaction.Meternumber,
+                    METERNAME = transaction.MeterName,
                     PAYER = transaction.PayersName,
-                    PHONE_NUMBER = transaction.RecipientPhoneNumber,
-                    STATUS = transaction.transactionsStatus
+                    PHONENUMBER = transaction.RecipientPhoneNumber,
+                    STATUS = transaction.transactionsStatus,
+                    DATE = transaction.Datetime
                 });
             }
             catch (WebException ex)
@@ -211,7 +212,7 @@ namespace kaedc.Controllers
             string meter_number = transact.Meternumber;
             string ref_id = transact.ApiUniqueReference;
             string access_token = transact.PhcnUnique;
-            string amount = transact.Amount;
+            string amount = Convert.ToString(transact.Amount);
             string phone = transact.RecipientPhoneNumber;
             string email = user.Email;
 
@@ -269,12 +270,13 @@ namespace kaedc.Controllers
                     ID = transact.Id,
                     SERVICE = model.Service,
                     AMOUNT = transact.Amount,
-                    METER_NUMBER = transact.Meternumber,
-                    METER_NAME = transact.MeterName,
+                    METERNUMBER = transact.Meternumber,
+                    METERNAME = transact.MeterName,
                     PAYER = transact.PayersName,
-                    PHONE_NUMBER = transact.RecipientPhoneNumber,
+                    PHONENUMBER = transact.RecipientPhoneNumber,
                     STATUS = transact.transactionsStatus,
-                    TOKEN = transact.Token
+                    TOKEN = transact.Token,
+                    DATE = transact.Datetime
                 });
             }
             catch (WebException ex)

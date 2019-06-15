@@ -7,10 +7,18 @@ namespace kaedc.Models
 {
     public class AgentReportModel
     {
-        public string Username { get; set; }
+        public string Fullname { get; set; }
 
-        public Kaedcuser User { get; set; }
+        public double TotalSales { get; set; }
 
-        public string TotalAmount { get; set; }
+        public double PrepaidTotalSales { get; set; }
+
+        public double PostpaidTotalSales { get; set; }
+
+        public decimal? PrepaidTotalProfit { get; set; }
+
+        public decimal? PostpaidTotalProfit { get; set; }
+
+        public string Location { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
 namespace kaedc.Models
@@ -8,7 +9,7 @@ namespace kaedc.Models
         public int Id { get; set; }
         public int ServiceId { get; set; }
         public int PaymentMethodId { get; set; }
-        public string Amount { get; set; }
+        public double Amount { get; set; }
         public string KaedcUser { get; set; }
         public DateTime Datetime { get; set; }
         public string MeterName { get; set; }

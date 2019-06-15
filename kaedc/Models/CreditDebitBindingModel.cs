@@ -14,7 +14,7 @@ namespace kaedc.Models
 
         [Required]
         [Display(Name = "Amount")]
-        public string Amount { get; set; }
+        public double Amount { get; set; }
 
         [Required]
         public int serviceId { get; set; } 

@@ -54,7 +54,7 @@ namespace kaedc.Controllers
             }
 
             var user = new Kaedcuser() { UserName = model.Username, Email = model.Email, Firstname = model.Firstname, Surname = model.Surname,
-                        MainBalance = 0, IsActive = 1, LoanBalance = 0, BrinqaccountNumber = GenerateAccountNumber(model), PhoneNumber = model.PhoneNumber};
+                MainBalance = 0, IsActive = 1, LoanBalance = 0, BrinqaccountNumber = GenerateAccountNumber(model), PhoneNumber = model.PhoneNumber, CreatedAt = DateTime.Now };
 
             var result = await _userManager.CreateAsync(user, model.Password);
 
@@ -66,7 +66,35 @@ namespace kaedc.Controllers
                 });
             }
 
-            return Ok(new { result, user, Status = StatusCode(200)});
+            var claims = new[]
+                    {
+                        //new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                        //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        new Claim(ClaimTypes.Name, user.Email),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    };
+
+            var signingkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("LongSecuritySecureKey"));
+
+            var token = new JwtSecurityToken(
+                issuer: "https://www.brinqkaedc.com",
+                audience: "https://www.brinqkaedc.com",
+                expires: DateTime.UtcNow.AddYears(1),
+                claims: claims,
+                signingCredentials: new SigningCredentials(signingkey, SecurityAlgorithms.HmacSha256)
+                );
+
+            return Ok(new { result,
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = token.ValidTo,
+                user.BrinqaccountNumber,
+                user.MainBalance,
+                user.IsActive,
+                user.Firstname,
+                user.Surname,
+                user.Email,
+                user.PhoneNumber, Status = StatusCode(200) });
+
         }
 
         private string GenerateAccountNumber(RegisterBindingModel model)
@@ -147,6 +175,7 @@ namespace kaedc.Controllers
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
 
         

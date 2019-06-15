@@ -27,7 +27,7 @@ namespace kaedc.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 optionsBuilder.UseMySql("Server=74.208.128.248;User Id=brinq;Password=N_wjo881;Database=kaedc; default command timeout=120;");
                 //optionsBuilder.UseMySql("Server=localhost;User Id=root;Password=root;Database=kaedc; default command timeout=120;");
             }

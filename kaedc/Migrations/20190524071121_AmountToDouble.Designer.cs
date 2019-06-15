@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using kaedc.Models;
 
 namespace kaedc.Migrations
 {
     [DbContext(typeof(Kaedc))]
-    partial class KaedcModelSnapshot : ModelSnapshot
+    [Migration("20190524071121_AmountToDouble")]
+    partial class AmountToDouble
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

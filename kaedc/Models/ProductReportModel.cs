@@ -17,25 +17,21 @@ namespace kaedc.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public decimal PrepaidSales { get; set; }
-        public decimal PostpaidSales { get; set; }
-        public decimal RefundSales { get; set; }
-        public decimal CreditSales { get; set; }
-        public decimal DebitSales { get; set; }
-        public decimal TotalSales { get; set; }
+        public double PrepaidSales { get; set; }
+        public double PostpaidSales { get; set; }
+        public double RefundSales { get; set; }
+        public double CreditSales { get; set; }
+        public double DebitSales { get; set; }
+        public double TotalSales { get; set; }
 
-        public decimal BrinqPrepaidProfit { get; set; }
-        public decimal BrinqPostpaidProfit { get; set; }
-        public decimal BrinqRefundProfit { get; set; }
-        public decimal BrinqCreditProfit { get; set; }
-        public decimal BrinqDebitProfit { get; set; }
-        public decimal BrinqTotalProfit { get; set; }
+        public decimal? BrinqPrepaidProfit { get; set; }
+        public decimal? BrinqPostpaidProfit { get; set; }
+        public decimal? BrinqTotalProfit { get; set; }
 
-        public decimal AgentPrepaidProfit { get; set; }
-        public decimal AgentPostpaidProfit { get; set; }
-        public decimal AgentRefundProfit { get; set; }
-        public decimal AgentCreditProfit { get; set; }
-        public decimal AgentDebitProfit { get; set; }
-        public decimal AgentTotalProfit { get; set; }
+        public decimal? AgentPrepaidProfit { get; set; }
+        public decimal? AgentPostpaidProfit { get; set; }
+        public decimal? AgentTotalProfit { get; set; }
     }
+
+    
 }

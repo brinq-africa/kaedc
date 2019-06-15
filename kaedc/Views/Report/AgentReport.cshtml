@@ -1,8 +1,6 @@
-﻿@model IEnumerable<kaedc.Models.Transaction>
-
-@*model PagedList.Core.IPagedList<kaedc.Models.Transaction>*@
+﻿@model List<kaedc.Models.AgentReportModel>
 @{
-    ViewData["Title"] = "viewtransactions";
+    ViewData["Title"] = "AgentReport";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -14,8 +12,8 @@
             <i class="fa fa-money"></i>
         </div>
         <div class="header-title">
-            <h1>Transaction</h1>
-            <small>Transaction List</small>
+            <h1>Report</h1>
+            <small>Agent Report</small>
         </div>
     </section>
     <!-- Main content -->
@@ -26,7 +24,7 @@
                     <div class="panel-heading">
                         <div class="btn-group" id="buttonexport">
                             <a href="">
-                                <h4>Transaction list</h4>
+                                <h4>Agent Report</h4>
                             </a>
                         </div>
                     </div>
@@ -106,73 +104,30 @@
                             <table id="dataTableExample1" class="table table-bordered table-striped table-hover">
                                 <thead>
                                     <tr class="info">
-                                        <th>Date</th>
-                                        <th>Account</th>
-                                        <th>Service</th>
-                                        <th>Amount</th>
-                                        <th>Agent's Profit</th>
-                                        <th>Brinq's Profit</th>
-                                        <th>Meter Number</th>
-                                        <th>Ref ID</th>
-                                        <th>Status Code</th>
-                                        <th>Status Message</th>
-                                        <th>Payment Method</th>
-                                        <th>User's IP address</th>
-                                        <th>Generated Token</th>
-                                        <th>Transaction Status</th>
+                                        <th>USER</th>
+                                        <th>TOTAL SALES</th>
+                                        <th>PREPAID</th>
+                                        <th>PROFIT</th>
+                                        <th>POSTPAID</th>
+                                        <th>PROFIT</th>
+                                        <th>LOCATION</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in ViewBag.Data)
+                                    @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td>@item.Datetime</td>
-                                            <td>@item.PayersName</td>
-                                            <td>@item.Service.Name</td>
-                                            <td>@item.Amount</td>
-                                            <td>
-                                                @if (@item.AgentProfit == null)
-                                                {
-                                                    <span>0.00</span>
-                                                }
-                                                else
-                                                {
-                                                    @String.Format("{0:0.00}", @item.AgentProfit)
-                                                }
-                                            </td>
-                                            <td>
-                                                @if (@item.BrinqProfit == null)
-                                                {
-                                                    <span>0.00</span>
-                                                }
-                                                else
-                                                {
-                                                    @String.Format("{0:0.00}", @item.BrinqProfit)
-                                                }
-                                            </td>
-                                            <td>@item.Meternumber</td>
-                                            <td>@item.ApiUniqueReference</td>
-                                            <td>@item.Statuscode</td>
-                                            <td>@item.StatusMessage</td>
-                                            <td>@item.PaymentMethod.Name</td>
-                                            <td>@item.PayerIp</td>
-                                            <td>@item.Token</td>
-                                            <td>@item.transactionsStatus</td>
+                                            <td>@item.Fullname</td>
+                                            <td>@item.TotalSales</td>
+                                            <td>@String.Format("{0:0.00}", item.PrepaidTotalSales)</td>
+                                            <td>@String.Format("{0:0.00}", item.PrepaidTotalProfit)</td>
+                                            <td>@String.Format("{0:0.00}", @item.PostpaidTotalSales)</td>
+                                            <td>@String.Format("{0:0.00}", @item.PostpaidTotalProfit)</td>
+                                            <td>@item.Location</td>
                                         </tr>
                                     }
-
                                 </tbody>
                             </table>
-                            <div>
-                                <ul class="pagination">
-                                    @for (var i = 1; i <= ViewBag.TotalPages; i++)
-                                    {
-                                       <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                           <a asp-page="" asp-route-page="@i" class="page-link">@i</a>
-                                       </li>
-                                    }
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </div>

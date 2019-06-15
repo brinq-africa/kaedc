@@ -9,6 +9,8 @@ using kaedc.Models;
 using kaedc.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using PagedList.Core;
+using kaedc.Interfaces;
 
 namespace kaedc.Controllers
 {
@@ -16,25 +18,46 @@ namespace kaedc.Controllers
     public class TransactionsController : Controller
     {
         private readonly Kaedc _context;
+        private readonly ITransaction _transaction;
 
-        public TransactionsController(Kaedc context)
+        public TransactionsController(Kaedc context, ITransaction transaction)
         {
             _context = context;
+            _transaction = transaction;
         }
 
-        public async Task<IActionResult> viewtransactions()
+        public async Task<IActionResult> Viewtransactions(int page = 1, int pageSize = 10)
         {
+            //***working version without pagination
             var kaedc = _context.Transaction.Include(t => t.PaymentMethod).Include(t => t.Service).OrderByDescending(i => i.Datetime);
-            return View(await kaedc.ToListAsync());
+            //return View(await kaedc.ToListAsync());
+
+            //***reflectionIt pagination library
+            //var kaedc = _context.Transaction.AsNoTracking().Include(t => t.PaymentMethod).Include(t => t.Service).OrderByDescending(i => i.Datetime);
+            //var paging = await PagingList.CreateAsync(kaedc, 10, page);
+            //return View(paging);
+
+            //***PagingList.Core.Mvc 
+            //PagedList<Transaction> model = new PagedList<Transaction>(kaedc, page, pageSize);
+            //return View("Viewtransactions", model);
+
+            var Data = await _transaction.GetPaginatedResult(page, pageSize);
+            var Count = await _transaction.GetCount();
+
+            ViewData["Data"] = Data;
+            ViewData["Count"] = Count;
+            ViewData["TotalPages"] = (int)Math.Ceiling(decimal.Divide(Count, pageSize));
+            ViewData["CurrentPage"] = 1;
+            return View();
         }
 
-        public async Task<IActionResult> pendingtransactions()
+        public async Task<IActionResult> Pendingtransactions()
         {
             var kaedc = _context.Transaction.Where(t => t.transactionsStatus == "pending").Include(t => t.PaymentMethod).Include(t => t.Service);
             return View(await kaedc.ToListAsync());
         }
 
-        public async Task<IActionResult> refundtransactions()
+        public async Task<IActionResult> Refundtransactions()
         {
             var kaedc = _context.Transaction.Where(t => t.ServiceId == 5).Include(t => t.PaymentMethod).Include(t => t.Service);
             return View(await kaedc.ToListAsync());

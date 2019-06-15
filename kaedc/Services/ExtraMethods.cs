@@ -73,7 +73,7 @@ namespace kaedc.Services
             return "No network adapters with an IPv4 address in the system!";
         }
 
-        public static void DebitUser(string brinqaccountNumber, string Amount)
+        public static void DebitUser(string brinqaccountNumber, double Amount)
         {
             Transaction transaction = new Transaction();
             var db = new Kaedc();
@@ -98,7 +98,7 @@ namespace kaedc.Services
             db.SaveChanges();
         }
 
-        public static void CreditUser(string brinqaccountNumber, string Amount)
+        public static void CreditUser(string brinqaccountNumber, double Amount)
         {
             Transaction transaction = new Transaction();
             var db = new Kaedc();
@@ -133,19 +133,19 @@ namespace kaedc.Services
             Kaedc db = new Kaedc();
 
             var amount = transaction.Amount;
-            const decimal commission = 0.005M;
-            decimal profit = 0.0M;
+            const double commission = 0.005;
+            double profit = 0.0;
             if (transaction.ServiceId == 1)
             {
-                profit = (Convert.ToDecimal(transaction.Amount) * commission);
+                profit = transaction.Amount * commission;
             }
-            user.MainBalance += profit;
+            user.MainBalance += Convert.ToDecimal(profit);
 
             
             profitTransacton.Id = GenerateId();
             profitTransacton.ServiceId = 6;
-            profitTransacton.AgentProfit = profit;
-            profitTransacton.Amount = profit.ToString();
+            profitTransacton.AgentProfit = Convert.ToDecimal(profit);
+            profitTransacton.Amount = profit;
             profitTransacton.PayersName = user.UserName;
             profitTransacton.PaymentMethodId = 1;
             profitTransacton.transactionsStatus = "completed";

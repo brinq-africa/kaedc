@@ -9,7 +9,9 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using kaedc.Interfaces;
 using kaedc.Models;
+using kaedc.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -123,6 +125,7 @@ namespace kaedc
             });
 
             services.AddSingleton<IEmailSender, EmailSender>();
+            services.AddScoped<ITransaction, TransactionService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -236,12 +239,16 @@ namespace kaedc
 
                 html += HttpUtility.HtmlEncode(@"Or copy paste the following link to your browser:" + message);
 
-                SmtpClient client = new SmtpClient();
-                client.Host = "brinqafrica.com/webmail";
-                client.Credentials = new NetworkCredential("noreply@brinqafrica.com", "Starcomms@123");
+                SmtpClient client = new SmtpClient
+                {
+                    Host = "brinqafrica.com/webmail",
+                    Credentials = new NetworkCredential("noreply@brinqafrica.com", "Starcomms@123")
+                };
 
-                MailMessage mailMessage = new MailMessage();
-                mailMessage.From = new MailAddress("noreply@brinqafrica.com");
+                MailMessage mailMessage = new MailMessage
+                {
+                    From = new MailAddress("noreply@brinqafrica.com")
+                };
                 mailMessage.To.Add(email);
                 mailMessage.Subject = subject;
                 //mailMessage.Body = message;
