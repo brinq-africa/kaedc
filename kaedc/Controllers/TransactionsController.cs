@@ -9,8 +9,8 @@ using kaedc.Models;
 using kaedc.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using PagedList.Core;
 using kaedc.Interfaces;
+using X.PagedList;
 
 namespace kaedc.Controllers
 {
@@ -26,28 +26,17 @@ namespace kaedc.Controllers
             _transaction = transaction;
         }
 
-        public async Task<IActionResult> Viewtransactions(int page = 1, int pageSize = 10)
+        public IActionResult Viewtransactions(int? page = 1, int pageSize = 10)
         {
             //***working version without pagination
             var kaedc = _context.Transaction.Include(t => t.PaymentMethod).Include(t => t.Service).OrderByDescending(i => i.Datetime);
             //return View(await kaedc.ToListAsync());
 
-            //***reflectionIt pagination library
-            //var kaedc = _context.Transaction.AsNoTracking().Include(t => t.PaymentMethod).Include(t => t.Service).OrderByDescending(i => i.Datetime);
-            //var paging = await PagingList.CreateAsync(kaedc, 10, page);
-            //return View(paging);
+            //**X.PagedList.Mvc.Core
+            var pageNumber = page ?? 1; // if no page was specified in the querystring, default to the first page (1)
+            var OnePageOfTransactions = kaedc.ToPagedList(pageNumber, pageSize); // will only contain 25 products max because of the pageSize
 
-            //***PagingList.Core.Mvc 
-            //PagedList<Transaction> model = new PagedList<Transaction>(kaedc, page, pageSize);
-            //return View("Viewtransactions", model);
-
-            var Data = await _transaction.GetPaginatedResult(page, pageSize);
-            var Count = await _transaction.GetCount();
-
-            ViewData["Data"] = Data;
-            ViewData["Count"] = Count;
-            ViewData["TotalPages"] = (int)Math.Ceiling(decimal.Divide(Count, pageSize));
-            ViewData["CurrentPage"] = 1;
+            ViewBag.OnePageOfTransactions = OnePageOfTransactions;
             return View();
         }
 

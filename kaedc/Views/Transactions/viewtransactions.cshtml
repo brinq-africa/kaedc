@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<kaedc.Models.Transaction>
-
 @*model PagedList.Core.IPagedList<kaedc.Models.Transaction>*@
 @{
     ViewData["Title"] = "viewtransactions";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+@using X.PagedList.Mvc.Core; //import this so we get our HTML Helper
+@using X.PagedList;
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -123,7 +123,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in ViewBag.Data)
+                                    @foreach (var item in ViewBag.OnePageOfTransactions)
                                     {
                                         <tr>
                                             <td>@item.Datetime</td>
@@ -163,16 +163,17 @@
 
                                 </tbody>
                             </table>
-                            <div>
-                                <ul class="pagination">
-                                    @for (var i = 1; i <= ViewBag.TotalPages; i++)
-                                    {
-                                       <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                           <a asp-page="" asp-route-page="@i" class="page-link">@i</a>
-                                       </li>
-                                    }
-                                </ul>
-                            </div>
+                            @Html.PagedListPager((IPagedList)ViewBag.OnePageOfTransactions, page => Url.Action("viewtransactions", new { page }))
+                            @*<div>
+                                    <ul class="pagination">
+                                        @for (var i = 1; i <= ViewBag.TotalPages; i++)
+                                        {
+                                           <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                               <a asp-page="" asp-route-page="@i" class="page-link">@i</a>
+                                           </li>
+                                        }
+                                    </ul>
+                                </div>*@
                         </div>
                     </div>
                 </div>

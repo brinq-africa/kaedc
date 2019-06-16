@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using X.PagedList;
 
 namespace kaedc.Controllers
 {
@@ -28,8 +29,8 @@ namespace kaedc.Controllers
         // GET: api/Transaction/5
         [HttpGet]
         [Authorize]
-        [Route("mytransactions")]
-        public async Task<IActionResult> mytransactions()
+        [Route("usertransactions")]
+        public async Task<IActionResult> usertransactions( int? page = 1, int pageSize = 15)
         { 
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
@@ -39,7 +40,7 @@ namespace kaedc.Controllers
 
             //var mytransactions = db.Kaedcuser.Where(t => t.Id == user.Id).Select(t => t.Transaction).ToList();
 
-            var mytransactions = db.Transaction.Where(i => i.KaedcUser == user.Id).OrderByDescending(i => i.Datetime).Select(i => new
+            var usertransactions = db.Transaction.Where(i => i.KaedcUser == user.Id).OrderByDescending(i => i.Datetime).Select(i => new
             {
                 ID = i.Id,
                 SERVICE = i.Service.Name,
@@ -50,7 +51,10 @@ namespace kaedc.Controllers
                 CREATEDBY = i.KaedcUserNavigation.UserName,
             }).ToList();
 
-            return Ok(mytransactions);
+            //**X.PagedList.Mvc.Core
+            var pageNumber = page ?? 1; // if no page was specified in the querystring, default to the first page (1)
+            var OnePageOfTransactions = usertransactions.ToPagedList(pageNumber, pageSize); // will only contain 25 products max because of the pageSize
+            return Ok(OnePageOfTransactions);
         }
     }
 }
